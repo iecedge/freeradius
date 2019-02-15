@@ -1,10 +1,20 @@
 FROM ubuntu:16.04
 
-RUN apt -y update; apt -y install software-properties-common;  \
-    add-apt-repository -y ppa:freeradius/stable
-RUN apt -y update; apt install -y freeradius=2.2.9-ppa1~xenial \
-    freeradius-mysql freeradius-postgresql freeradius-utils    \
-    mysql-client-core-5.7 curl gettext-base
+COPY ./VERSION VERSION
+
+RUN if test "$(uname -m)" = "x86_64" ; then SUFFIX="+dfsg-0.1ubuntu0.1"; else SUFFIX="+dfsg-0.1build2"; fi \
+    && VERSION=$(cat VERSION) \
+    && apt -y update \
+    && apt -y install \
+        software-properties-common \
+        libfreeradius2=${VERSION}${SUFFIX} \
+        freeradius=${VERSION}${SUFFIX} \
+        freeradius-mysql=${VERSION}${SUFFIX} \
+        freeradius-postgresql=${VERSION}${SUFFIX} \
+        freeradius-utils=${VERSION}${SUFFIX} \
+        mysql-client-core-5.7 \
+        curl \
+        gettext-base
 
 EXPOSE 1812/udp 1813/udp
 
